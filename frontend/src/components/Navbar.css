@@ -1,0 +1,74 @@
+#navbar {
+    height: 60px;
+    padding: 5px 10px;
+    background-color: yellow;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif
+}
+
+#logoImg {
+    height: 50px;
+    width: fit-content;
+}
+
+#buttonsContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.contentButtons {
+    margin: 5px 10px;
+    padding: 5px;
+    background-color: yellow;
+    border-width: 0;
+    font-size: large;
+    font-weight: bold;
+}
+
+#estimateText {
+    background-color: yellow;
+}
+
+.contentButtons:hover {
+    cursor: pointer;
+}
+
+.selected {
+    border-width: 1px;
+    font-size: xx-large;
+}
+
+#rightContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#helloText {
+    margin-right: 10px;
+    font-size: 20px;
+}
+
+#lineSeparator {
+    height: 40px;
+    width: 2px;
+    background-color: black;
+}
+
+#logOutButton {
+    margin: 5px;
+    padding: 5px;
+    background-color: yellow;
+    border-width: 0;
+    font-size: large;
+    font-weight: bold;
+    transition: all 250ms;
+}
+
+#logOutButton:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}

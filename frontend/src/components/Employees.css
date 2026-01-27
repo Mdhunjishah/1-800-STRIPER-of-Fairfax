@@ -1,0 +1,71 @@
+#employeeContentContainer{
+    margin: auto;
+    margin-top: 20px;
+    padding: 10px 20px 20px 20px;
+    width: fit-content;
+    background-color: #eef1f8;
+    border-radius: 10px;
+}
+
+#employeeTableTitle {
+    margin: 0 0 10px 0;
+}
+
+#tableContainer {
+    max-height: calc(100vh - 177px);
+    width: fit-content;
+    margin: auto;
+    overflow-y: auto;
+    border: 1px solid grey;
+    cursor: default;
+}
+
+#employeeTable {
+    text-align: center;
+    width: 600px;
+    border-collapse: collapse;
+}
+
+th, td {
+    border-bottom: 1px solid grey;
+    background-color: white;
+}
+
+th {
+    position: sticky;
+    padding: 10px;
+    top: 0;
+    z-index: 10;
+    box-shadow: inset 0 -2px 0 black;
+    
+}
+
+td {
+    padding: 10px;
+}
+
+tr {
+    margin: 10px;
+}
+
+.colorCell {
+    padding: 5px 10px;
+    border-radius: 15px;
+    /* width: fit-content;
+    margin: auto; */
+}
+
+.deleteCell:hover {
+    cursor: pointer;
+    font-size: larger;
+}
+
+select {
+    padding: 5px;
+    border-radius: 15px;
+}
+
+option {
+    background-color: white;
+}
+

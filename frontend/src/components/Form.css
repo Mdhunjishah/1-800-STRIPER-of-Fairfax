@@ -1,0 +1,78 @@
+#form {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 20;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#formTitle {
+    width: fit-content;
+    margin: auto;
+    margin-top: 0;
+    text-decoration: underline;
+}
+
+#errorMsg {
+    width: fit-content;
+    margin: auto;
+    color: red;
+}
+
+#formArea {
+    position: relative;
+    width: fit-content;
+    max-height: 80vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 10px;
+    background-color: rgb(235, 250, 255);
+    border: 1px solid black;
+    scroll-behavior: smooth;
+}
+
+select {
+    margin-left: 5px;
+}
+
+select:hover {
+    cursor: pointer;
+}
+
+#notes {
+    height: 100px;
+    width: 300px;
+    resize: none;
+}
+
+button {
+    margin-right: 10px;
+    border-width: 1px;
+}
+
+#deleteBtn {
+    position: absolute;
+    right: 0;
+    bottom: 10px;
+}
+
+#formCreateBtn:hover {
+    cursor: pointer;
+    background-color: lightgreen;
+}
+
+#cancelBtn:hover {
+    cursor: pointer;
+    background-color: rgb(143, 188, 255);
+}
+
+#deleteBtn:hover {
+    cursor: pointer;
+    background-color: rgb(236, 154, 154);
+}
+
