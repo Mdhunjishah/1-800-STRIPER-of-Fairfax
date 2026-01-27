@@ -50,7 +50,7 @@ const SignIn = ({ signUserIn }) => {
 
     if(signUp){
       if(fname && lname){
-        api.post("http://localhost:5000/api/employee", { first_name: fname, last_name: lname, email: email, password: password })
+        api.post("/employee", { first_name: fname, last_name: lname, email: email, password: password })
           .then((res) => {
             if(res.data.success){
               signUserIn(res.data.data)  
@@ -69,7 +69,7 @@ const SignIn = ({ signUserIn }) => {
 
       
     } else {
-      api.post("http://localhost:5000/api/employee/signin", { email: email, password: password })
+      api.post("/employee/signin", { email: email, password: password })
         .then((res) => {
           if(res.data.verified){
             signUserIn(res.data.data)

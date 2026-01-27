@@ -55,7 +55,7 @@ const Estimates = ({ permission }) => {
     }
 
     function estimateCreated(estimateData){
-        api.post("http://localhost:5000/api/estimate", estimateData)
+        api.post("/estimate", estimateData)
             .then((res) => {
                 const typeFilter = document.getElementById("typeFilter").value
                 const statusFilter = document.getElementById("statusFilter").value
@@ -94,7 +94,7 @@ const Estimates = ({ permission }) => {
     }
 
     function estimateUpdated(updateData){
-        api.put("http://localhost:5000/api/estimate", { id: data[formInfo]._id,update: updateData })
+        api.put("/estimate", { id: data[formInfo]._id,update: updateData })
             .then((res) => {
                 const typeFilter = document.getElementById("typeFilter").value
                 const statusFilter = document.getElementById("statusFilter").value
@@ -138,7 +138,7 @@ const Estimates = ({ permission }) => {
     }
 
     function deleteEntry(){
-        api.delete("http://localhost:5000/api/estimate", { data : { id: data[formInfo]._id} })
+        api.delete("/estimate", { data : { id: data[formInfo]._id} })
             .then((res) => {
                 removeEstimateFromTable(formInfo)
             })
@@ -152,7 +152,7 @@ const Estimates = ({ permission }) => {
     function removeEstimateFromTable(index){
         if(moreData){
             const query = getQuery(2, pageNumber * LIMIT - 1)
-            api.get("http://localhost:5000/api/estimate" + query)
+            api.get("/estimate" + query)
                 .then((res) => {
                     const resData = res.data.data
                     if(resData.length === 1)
@@ -199,7 +199,7 @@ const Estimates = ({ permission }) => {
 
     function refreshTable(){
         let query = getQuery(LIMIT + 1, (LIMIT * (pageNumber - 1)))
-        api.get("http://localhost:5000/api/estimate" + query)
+        api.get("/estimate" + query)
             .then((res) => {
                 const newData = res.data.data
                 if(newData.length === (LIMIT + 1)){

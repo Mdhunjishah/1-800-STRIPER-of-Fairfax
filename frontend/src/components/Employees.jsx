@@ -7,7 +7,7 @@ const Employees = ({ user, setUser }) => {
     const [data, setData] = useState([])
 
     useEffect(() => {
-        api.get("http://localhost:5000/api/employee")
+        api.get("/employee")
             .then((res) => {
                 setData(res.data.data)
             })
@@ -25,7 +25,7 @@ const Employees = ({ user, setUser }) => {
             newPermission = 'Editor'
 
 
-        api.put("http://localhost:5000/api/employee", { id: data[loc]._id, update: {permission: newPermission} })
+        api.put("/employee", { id: data[loc]._id, update: {permission: newPermission} })
             .then((res) => {
                 let newData = [...data]
                 newData[loc] = res.data.data
@@ -43,7 +43,7 @@ const Employees = ({ user, setUser }) => {
     function deleteEmployee(e){
         const loc = e.target.parentElement.id
 
-        api.delete("http://localhost:5000/api/employee", { data : { id: data[loc]._id} })
+        api.delete("/employee", { data : { id: data[loc]._id} })
             .then((res) => {
                 let newData = [...data]
                 newData.splice(loc, 1)
