@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+import api from "./lib/axios"
 import './App.css'
 import Navbar from './components/Navbar'
 import Estimates from './components/Estimates'
@@ -14,7 +14,7 @@ const App = () => {
   useEffect(() => {
     const id = getCookie("id")
     if(id){
-      axios.get(`http://localhost:5000/api/employee/${id}`)
+      api.get(`/employee/${id}`)
         .then((res) => {
           setUser(res.data.data)
           setSignedIn(true)

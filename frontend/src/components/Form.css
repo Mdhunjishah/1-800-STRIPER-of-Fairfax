@@ -44,6 +44,10 @@ select:hover {
     cursor: pointer;
 }
 
+#due_date {
+    margin-left: 5px;
+}
+
 #notes {
     height: 100px;
     width: 300px;
@@ -58,7 +62,6 @@ button {
 #deleteBtn {
     position: absolute;
     right: 0;
-    bottom: 10px;
 }
 
 #formCreateBtn:hover {

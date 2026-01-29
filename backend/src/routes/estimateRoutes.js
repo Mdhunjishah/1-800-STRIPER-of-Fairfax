@@ -20,10 +20,36 @@ router.get('/', async (req, res) => {
 
     sortBy = sortBy || "estimate_number"
     let sortingCriteria = {}
-    sortingCriteria[sortBy] = -1
+    sortingCriteria[sortBy] = (sortBy === "due_date") ? 1 : -1
 
     try {
-        const estimates = await Estimate.find(filter).sort(sortingCriteria).skip(offset).limit(limit)
+        let estimates
+
+        if(sortBy !== "due_date"){
+            estimates = await Estimate.find(filter).sort(sortingCriteria).skip(offset).limit(limit)
+        } else {
+            estimates = await Estimate.aggregate([
+                {
+                    $match: filter
+                },
+                {
+                    $addFields: {
+                        due_date_exists: {
+                            $cond: ["$due_date", 1, 0]
+                        }
+                    }
+                },
+                {
+                    $sort: { due_date_exists: -1, due_date: 1 },
+                },
+                {
+                    $skip: Number(offset)
+                },
+                {
+                    $limit: Number(limit)
+                }
+            ])
+        }
 
         res.status(200).json({ success: true, data: estimates })
     } catch (error) {
@@ -34,13 +60,6 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
     let estimate = req.body
-
-    const doc = await Estimate.find().sort({ estimate_number: -1 }).limit(1)
-
-    if(doc.length === 0)
-        estimate.estimate_number = 1
-    else
-        estimate.estimate_number = doc[0].estimate_number + 1
 
     const newEstimate = new Estimate(estimate)
 

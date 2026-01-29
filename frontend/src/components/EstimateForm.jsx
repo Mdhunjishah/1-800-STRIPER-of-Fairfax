@@ -12,6 +12,12 @@ const EstimateForm = ({ data, permission, created, modified, cancelled, deleted 
 
         //Check Form Data
         let errors = []
+        if(!(/^\d+$/.test(formData.get("estimate_number")))){
+            if(!formData.get("estimate_number"))
+                errors.push("Enter an Estimate Number")
+            else
+                errors.push("Estimate Numbers Must Contain Only Digits")
+        }
         if(!formData.get("client")){
             errors.push("Enter a Client")
         }
@@ -54,9 +60,10 @@ const EstimateForm = ({ data, permission, created, modified, cancelled, deleted 
             let newData = {}
 
             for(const [key, value] of formData.entries()){
-                newData[key] = value
+                if(value)
+                    newData[key] = value
             }
-
+            
             created(newData)
         }
        
@@ -70,6 +77,16 @@ const EstimateForm = ({ data, permission, created, modified, cancelled, deleted 
     function deleteEntry(e){
         e.preventDefault()
         deleted()
+    }
+
+    function formateDateForForm(date_data){
+        const date = new Date(date_data)
+
+        const year = date.getUTCFullYear()
+        const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+        const day = String(date.getUTCDate()).padStart(2, '0')
+
+        return `${year}-${month}-${day}`;
     }
         
     return (
@@ -90,6 +107,8 @@ const EstimateForm = ({ data, permission, created, modified, cancelled, deleted 
                 }
 
                 <form id="estimateForm">
+                    <label htmlFor="estimate_number">Estimate Number:</label><br></br>
+                    <input id="estimate_number" name="estimate_number" type="text" defaultValue={data ? data.estimate_number : null}></input><br></br><br></br>
                     <label htmlFor="client">Client:</label><br></br>
                     <input id="client" name="client" type="text" defaultValue={data ? data.client : null}></input><br></br><br></br>
                     <label htmlFor="point_of_contact">Point of Contact:</label><br></br>
@@ -116,8 +135,10 @@ const EstimateForm = ({ data, permission, created, modified, cancelled, deleted 
                         <option value="Lost">Lost</option>
                         <option value="Other">Other</option>
                     </select><br></br><br></br>
+                    <label htmlFor="due_date">Due Date:</label>
+                    <input id="due_date" name="due_date" type="date" defaultValue={(data && data.due_date) ? formateDateForForm(data.due_date) : null}></input><br></br><br></br>
                     <label htmlFor="notes">Notes:</label><br></br>
-                    <textarea id="notes" name="notes" defaultValue={data ? data.notes : null}></textarea><br></br><br></br>
+                    <textarea id="notes" name="notes" defaultValue={(data && data.notes) ? data.notes : null}></textarea><br></br><br></br>
                     <button id="formCreateBtn" onClick={tryToSubmit}>{data ? "Save & Close" : "Create"}</button>
                     <button id="cancelBtn" onClick={closeForm}>Cancel</button>
                     {(data && permission === "Admin") ? <button id="deleteBtn" onClick={deleteEntry}>Delete</button> : null}

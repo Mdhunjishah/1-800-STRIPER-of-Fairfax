@@ -1,3 +1,4 @@
+import { request } from "express";
 import mongoose from "mongoose";
 
 const estimateSchema = new mongoose.Schema({
@@ -27,6 +28,10 @@ const estimateSchema = new mongoose.Schema({
     },
     notes: {
         type: String,
+        required: false
+    },
+    due_date: {
+        type: Date,
         required: false
     }
 }, {timestamps: true})
