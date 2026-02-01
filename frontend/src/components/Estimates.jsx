@@ -2,13 +2,13 @@ import React from 'react'
 import api from "../lib/axios"
 import './Estimates.css'
 import { useState, useEffect } from 'react'
+import toast, { Toaster } from 'react-hot-toast'
 import EstimateForm from './EstimateForm'
 
 const LIMIT = 50
 
 const Estimates = ({ permission }) => {
     const [data, setData] = useState([])
-    const [showForm, setShowForm] = useState(false)
     const [formInfo, setFormInfo] = useState(null)
     const [pageNumber, setPageNumber] = useState(1)
     const [moreData, setMoreData] = useState(true)
@@ -27,6 +27,11 @@ const Estimates = ({ permission }) => {
         const day = useUTC ? date.getUTCDate() : date.getDate()
         const year = useUTC ? date.getUTCFullYear() : date.getFullYear()
         return `${month + 1}/${day}/${year - Math.floor(year / 100) * 100}`
+    }
+
+    function formatPhoneNumber(number){
+        const numberAsString = number.toString()
+        return `${numberAsString.slice(0, 3)}-${numberAsString.slice(3, 6)}-${numberAsString.slice(6)}`
     }
 
     const typeColorDict = {
@@ -58,8 +63,11 @@ const Estimates = ({ permission }) => {
     }
 
     function estimateCreated(estimateData){
+        const loadingToast = toast.loading("loading")
         api.post("/estimate", estimateData)
             .then((res) => {
+                closeNotes()
+
                 const typeFilter = document.getElementById("typeFilter").value
                 const statusFilter = document.getElementById("statusFilter").value
                 const sort = document.getElementById("sortBy").value
@@ -96,16 +104,23 @@ const Estimates = ({ permission }) => {
                     }
                 }
 
-                setShowForm(false)
+                toast.remove(loadingToast)
+                toast.success("Estimate Created")
             })
             .catch((error) => {
+                toast.remove(loadingToast)
+                toast.error("Sorry, the Estimate couldn\'t be created")
                 console.log(error)
             })
+        setFormInfo(null)
     }
 
     function estimateUpdated(updateData){
+        const loadingToast = toast.loading("loading")
         api.put("/estimate", { id: data[formInfo]._id,update: updateData })
             .then((res) => {
+                closeNotes()
+
                 const typeFilter = document.getElementById("typeFilter").value
                 const statusFilter = document.getElementById("statusFilter").value
                 const estimateType = updateData.type || data[formInfo].type
@@ -113,7 +128,7 @@ const Estimates = ({ permission }) => {
                 
                 if(typeInFilter(estimateType, typeFilter) && statusInFilter(estimateStatus, statusFilter)){
                     const sort = document.getElementById("sortBy").value
-                    if(sort === "Due Date"){
+                    if(sort === "Due Date" && updateData.due_date){
                         refreshTable()
                     } else {
                         if(sort === "Status Updated" && updateData.status){
@@ -133,34 +148,45 @@ const Estimates = ({ permission }) => {
                     removeEstimateFromTable(formInfo)
                 }
 
-                setShowForm(false)
+                toast.remove(loadingToast)
+                toast.success("Estimate Saved")
             })
             .catch((error) => {
+                toast.remove(loadingToast)
+                toast.error("Sorry, the Estimate couldn\'t be updated")
                 console.log(error)
             })
-
+            setFormInfo(null)
     }
 
-    function formCancelled(){
-        setShowForm(false)
+    function formCancelled(showSavedMessage){
+        if(showSavedMessage)
+            toast.success("Estimate Saved")
+        setFormInfo(null)
     }
 
     function editForm(e){
-        const loc = e.target.parentElement.id
+        const loc = Number(e.target.parentElement.id) / 2
         setFormInfo(loc)
-        setShowForm(true)
     }
 
     function deleteEntry(){
+        const loadingToast = toast.loading("loading")
         api.delete("/estimate", { data : { id: data[formInfo]._id} })
             .then((res) => {
+                closeNotes()
                 removeEstimateFromTable(formInfo)
+
+                toast.remove(loadingToast)
+                toast.success("Estimate Deleted")
             })
             .catch((error) => {
+                toast.remove(loadingToast)
+                toast.error("Sorry, the Estimate couldn\'t be deleted")
                 console.log(error)
             })
 
-        setShowForm(false)
+        setFormInfo(null)
     }
 
     function removeEstimateFromTable(index){
@@ -239,6 +265,22 @@ const Estimates = ({ permission }) => {
         
     }
 
+    function getLines(notes){
+        let lines = notes.split('\n')
+        while(lines.length > 0 && lines[lines.length - 1] === "")
+            lines.pop()
+        return lines.map((line, i) => <p className="noteLines" key={i}>{line}</p>)
+    }
+
+    function closeNotes(){
+        document.querySelectorAll(".notesRowContainer").forEach(container => {
+            container.style.transition = "none"
+            container.style.height = "0px"
+        })
+        
+        document.querySelectorAll(".notesRowShown").forEach(row => row.className = "notesRowHidden")
+    }
+
     return (
         <div>
             <div id="estimateContentContainer">
@@ -273,7 +315,7 @@ const Estimates = ({ permission }) => {
                             <option value="Due Date">Due Date</option>
                         </select>
                     </div>
-                    <button id="createBtn" onClick={() => {setFormInfo(null); setShowForm(true)}}>Create Estimate</button>   
+                    <button id="createBtn" onClick={() => {setFormInfo(-1)}}>Create Estimate</button>   
                 </div>
 
                 <div id="estimateTableContainer">
@@ -296,38 +338,39 @@ const Estimates = ({ permission }) => {
                         <tbody>
                             {data.length === 0 ? <tr><td colSpan="11">No Estimates Yet</td></tr> : data.map((obj, i) => (
                                 <>
-                                    <tr id={i} key={2*i}>
+                                    <tr id={2*i} key={2*i} className="estimateTr">
                                         <td>{formatDate(obj.createdAt, false)}</td>
                                         <td>{"#" + obj.estimate_number}</td>
                                         <td>{obj.client}</td>
                                         <td>{obj.point_of_contact}</td>
-                                        <td>{obj.phone_number}</td>
+                                        <td>{formatPhoneNumber(obj.phone_number)}</td>
                                         <td><div className="colorCell" style={{backgroundColor: typeColorDict[obj.type]}}>{obj.type}</div></td>
                                         <td><div className="colorCell" style={{backgroundColor: typeColorDict[obj.status]}}>{obj.status}</div></td>
                                         <td>{formatDate(obj.updatedAt, false)}</td>
                                         <td>{obj.due_date ? formatDate(obj.due_date, true) : "-"}</td>
                                         <td className="noteToggle" onClick={(e) => {
-                                            const id = e.target.parentElement.id
+                                            const id = Number(e.target.parentElement.id) + 1
                                             const notesElement = document.getElementById("notesRow" + id)
                                             if(notesElement.className === "notesRowHidden"){
-                                                document.getElementById("notesContainer" + id).style.animation = "expand 250ms linear 1 forwards"
                                                 notesElement.className = "notesRowShown"
+                                                document.getElementById("notesContainer" + id).style.transition = "all 250ms linear 0s"
+                                                document.getElementById("notesContainer" + id).style.height = `${document.getElementById("notesContentContainer" + id).offsetHeight}px`
                                             } else {
-                                                document.getElementById("notesContainer" + id).style.animation = "close 250ms linear 1 forwards"
+                                                document.getElementById("notesContainer" + id).style.height = "0px"
                                                 setTimeout(() => {notesElement.className = "notesRowHidden"}, 250)
                                             }
                                                 
                                         }}>📋</td>
                                         <td className="editCell" onClick={editForm}>✏️</td>
                                     </tr>
-                                    <tr id={`notesRow${i}`} className="notesRowHidden" key={2*i + 1}>
+                                    <tr id={`notesRow${2*i + 1}`} className="notesRowHidden" key={2*i + 1}>
                                         <td className="notesRowContent" colSpan="11">
-                                            <div id={`notesContainer${i}`} className="notesRowContainer">
-                                                <div style={{padding: "10px"}}>
-                                                    {obj.notes ? 
+                                            <div id={`notesContainer${2*i + 1}`} className="notesRowContainer">
+                                                <div id={`notesContentContainer${2*i + 1}`} className="notesContent">
+                                                    {obj.notes && !(/^\s*$/.test(obj.notes)) ? 
                                                     <>
                                                         <p className="notesRowTitle">Notes:</p>
-                                                        <textarea className="notesRowText" value={obj.notes} readOnly></textarea>   
+                                                        {getLines(obj.notes)}
                                                     </>
                                                     : <p>No Notes Yet</p>}
                                                     
@@ -355,7 +398,8 @@ const Estimates = ({ permission }) => {
                 </div>
             </div>
 
-            {showForm ? <EstimateForm data={formInfo ? data[formInfo] : null} permission={permission} created={estimateCreated} modified={estimateUpdated} cancelled={formCancelled} deleted={deleteEntry}/> : null}  
+            {(formInfo !== null) ? <EstimateForm data={(formInfo !== -1) ? data[formInfo] : null} permission={permission} created={estimateCreated} modified={estimateUpdated} cancelled={formCancelled} deleted={deleteEntry}/> : null}  
+            <Toaster/>
         </div>
         
     )

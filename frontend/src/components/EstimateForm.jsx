@@ -45,7 +45,31 @@ const EstimateForm = ({ data, permission, created, modified, cancelled, deleted 
             let changeMade = false
 
             for(const [key, value] of formData.entries()){
-                if(data[key] != value){
+                if(key === "due_date" || key === "notes"){
+                    if(data[key]){
+                        if(key === "due_date"){
+                            if(formatDateForForm(data[key]) !== value){
+                                newData[key] = value
+                                changeMade = true    
+                            }
+                        } else if(key === "notes"){
+                            if(data[key] !== value){
+                                newData[key] = value
+                                changeMade = true    
+                            }
+                        }
+                    } else{
+                        if(value){
+                            newData[key] = value
+                            changeMade = true
+                        }
+                    }
+                } else if(key === "estimate_number" || key === "phone_number"){
+                    if(Number(value) !== data[key]){
+                        newData[key] = value
+                        changeMade = true
+                    }
+                } else if(data[key] !== value){
                     newData[key] = value
                     changeMade = true
                 }
@@ -54,7 +78,7 @@ const EstimateForm = ({ data, permission, created, modified, cancelled, deleted 
             if(changeMade)
                 modified(newData)
             else
-                cancelled()
+                cancelled(true)
 
         } else {
             let newData = {}
@@ -63,7 +87,7 @@ const EstimateForm = ({ data, permission, created, modified, cancelled, deleted 
                 if(value)
                     newData[key] = value
             }
-            
+
             created(newData)
         }
        
@@ -71,15 +95,17 @@ const EstimateForm = ({ data, permission, created, modified, cancelled, deleted 
 
     function closeForm(e){
         e.preventDefault()
-        cancelled()
+        cancelled(false)
     }
 
     function deleteEntry(e){
         e.preventDefault()
-        deleted()
+        const confirmDelete = window.confirm("Would you like to delete this Estimate?")
+        if(confirmDelete)
+            deleted()
     }
 
-    function formateDateForForm(date_data){
+    function formatDateForForm(date_data){
         const date = new Date(date_data)
 
         const year = date.getUTCFullYear()
@@ -93,18 +119,16 @@ const EstimateForm = ({ data, permission, created, modified, cancelled, deleted 
 
         <div id="form">
             <div id="formArea">
-                {data ? null :
-                    <>
-                        <h1 id="formTitle">New Estimate</h1>
-                        {(errors.length > 0) ? 
-                            <>
-                                <br></br>
-                                {errors.map((error, i) => <p key={i} id="errorMsg">{error}</p>)}
-                            </>
-                         : null}
-                        <br></br>
-                    </>
-                }
+                <div>
+                    <h1 id="formTitle">{data ? `Estimate #${data.estimate_number}` : "New Estimate"}</h1>
+                    {(errors.length > 0) ? 
+                        <>
+                            <br></br>
+                            {errors.map((error, i) => <p key={i} id="errorMsg">{error}</p>)}
+                        </>
+                        : null}
+                    <br></br>
+                </div>
 
                 <form id="estimateForm">
                     <label htmlFor="estimate_number">Estimate Number:</label><br></br>
@@ -136,7 +160,7 @@ const EstimateForm = ({ data, permission, created, modified, cancelled, deleted 
                         <option value="Other">Other</option>
                     </select><br></br><br></br>
                     <label htmlFor="due_date">Due Date:</label>
-                    <input id="due_date" name="due_date" type="date" defaultValue={(data && data.due_date) ? formateDateForForm(data.due_date) : null}></input><br></br><br></br>
+                    <input id="due_date" name="due_date" type="date" defaultValue={(data && data.due_date) ? formatDateForForm(data.due_date) : null}></input><br></br><br></br>
                     <label htmlFor="notes">Notes:</label><br></br>
                     <textarea id="notes" name="notes" defaultValue={(data && data.notes) ? data.notes : null}></textarea><br></br><br></br>
                     <button id="formCreateBtn" onClick={tryToSubmit}>{data ? "Save & Close" : "Create"}</button>

@@ -26,7 +26,7 @@
     border-collapse: collapse;
 }
 
-th, td {
+th, .employeeTr {
     border-bottom: 1px solid grey;
     background-color: white;
 }

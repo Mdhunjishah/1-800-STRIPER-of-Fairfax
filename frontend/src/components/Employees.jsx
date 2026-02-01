@@ -2,6 +2,7 @@ import React from 'react'
 import api from "../lib/axios"
 import './Employees.css'
 import { useState, useEffect } from 'react'
+import toast, { Toaster } from 'react-hot-toast'
 
 const Employees = ({ user, setUser }) => {
     const [data, setData] = useState([])
@@ -23,8 +24,7 @@ const Employees = ({ user, setUser }) => {
         let newPermission = 'Admin'
         if(data[loc].permission === 'Admin')
             newPermission = 'Editor'
-
-
+        
         api.put("/employee", { id: data[loc]._id, update: {permission: newPermission} })
             .then((res) => {
                 let newData = [...data]
@@ -41,15 +41,25 @@ const Employees = ({ user, setUser }) => {
     }
 
     function deleteEmployee(e){
-        const loc = e.target.parentElement.id
+        const confirmDelete = window.confirm("Would you like to delete this Employee?")
+        if(!confirmDelete)
+            return
 
+        const loc = e.target.parentElement.id
+        const loadingToast = toast.loading("loading")
+        
         api.delete("/employee", { data : { id: data[loc]._id} })
             .then((res) => {
                 let newData = [...data]
                 newData.splice(loc, 1)
                 setData(newData)
+
+                toast.remove(loadingToast)
+                toast.success("Employee Deleted")
             })
             .catch((error) => {
+                toast.remove(loadingToast)
+                toast.error("Sorry, the Employee couldn\'t be deleted")
                 console.log(error)
             })
     }
@@ -70,7 +80,7 @@ const Employees = ({ user, setUser }) => {
                         </thead>
                         <tbody>
                             {data.map((obj, i) => (
-                            <tr id={i} key={i}>
+                            <tr id={i} className="employeeTr" key={i}>
                                 <td>{`${obj.first_name} ${obj.last_name}`}</td>
                                 <td>{obj.email}</td>
                                 {/* <td><div className="colorCell" style={{backgroundColor: typeColorDict[obj.permission]}}>{obj.permission}</div></td> */}
@@ -88,7 +98,8 @@ const Employees = ({ user, setUser }) => {
                         </tbody>
                     </table>    
                 </div>
-            </div> 
+            </div>
+            <Toaster/>
         </div>
         
     )

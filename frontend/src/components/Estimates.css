@@ -73,7 +73,7 @@
     border-collapse: collapse;
 }
 
-th, td {
+th, .estimateTr {
     border-bottom: 1px solid grey;
     background-color: white;
 }
@@ -107,11 +107,12 @@ td {
 }
 
 .notesRowHidden {
-    display: none;
+    border-bottom: none;
 }
 
 .notesRowShown {
-    display: table-row;
+    border-bottom: 1px solid grey;
+    background-color: white;
 }
 
 .notesRowContent {
@@ -120,25 +121,27 @@ td {
 }
 
 .notesRowContainer {
-    height: 0;
+    height: 0px;
     overflow-y: hidden;
+    transition: all 250ms linear 0s;
+}
+
+.notesContent {
+    padding: 10px;
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 .notesRowTitle {
     margin: 0 0 5px 0;
+    font-size: large;
+    font-weight: bold;
+    text-decoration: underline;
 }
 
-.notesRowText {
-    height: 100px;
-    width: calc(50% - 10px);
-    resize: none;
-    cursor: default;
-    border: 1px solid black;
-}
-
-.notesRowText:focus {
-    outline: none;
-    border: 1px solid black;
+.noteLines {
+    margin: 5px 0;
+    height: 18px;
 }
 
 #changePageContainer {
@@ -159,22 +162,4 @@ td {
 
 #pageNumberText {
     padding: 0;
-}
-
-@keyframes expand {
-    0% {
-        height: 0;
-    }
-    100% {
-        height: 150px;
-    }
-}
-
-@keyframes close {
-    0% {
-        height: 150px;
-    }
-    100% {
-        height: 0;
-    }
 }
